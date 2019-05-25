@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+<testsuite name="TestResults" errors="0" tests="23" failures="13" time="0.0">
+<testcase classname="SuitTests.LayoutTests" name="testSetup" time="0.0">
+</testcase>
+<testcase classname="SuitTests.LayoutTests" name="testMultipleRoots" time="0.0">
+</testcase>
+<testcase classname="SuitTests.LayoutTests" name="testSingleSubview" time="0.0">
+</testcase>
+<testcase classname="SuitTests.LayoutTests" name="testTwoSiblings" time="0.0">
+</testcase>
+<testcase classname="SuitTests.StringDocumentTests" name="testDocumentLength" time="0.0">
+</testcase>
+<testcase classname="SuitTests.StringDocumentTests" name="testDeletion" time="0.0">
+</testcase>
+<testcase classname="SuitTests.StringDocumentTests" name="testLineRangeCalculation" time="0.0">
+</testcase>
+<testcase classname="SuitTests.StringDocumentTests" name="testNewLineInsert" time="0.0">
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testCaretMovement" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testCaretMovementSimple" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testDeleteAtCaret" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testDeleteSelection" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testEmptyLastLine" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testMouseClickAtEnd" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testMouseSelection" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testSingleLine" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testTextAreaLineCount" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testTextAreaOffsetConversion" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testTextInsertion" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAreaTests" name="testTriggerCharacters" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.TextAttributeTests" name="testSimpleTextAttributes" time="0.0">
+</testcase>
+<testcase classname="SuitTests.TextAttributeTests" name="testTextAreaAttributes" time="0.0">
+<failure message="failed"></failure>
+</testcase>
+<testcase classname="SuitTests.StringDocumentTests" name="testLargeDocument" time="0.0">
+</testcase>
+</testsuite>
+</testsuites>

@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Cairo",
+        "repositoryURL": "https://github.com/pmacro/Cairo",
+        "state": {
+          "branch": "master",
+          "revision": "da483f88b890cffa5cb6bb7b3016afbb7f23c8b4",
+          "version": null
+        }
+      },
+      {
+        "package": "Yoga",
+        "repositoryURL": "https://github.com/pmacro/Yoga",
+        "state": {
+          "branch": "master",
+          "revision": "4d01700b15763f62b210616252c6ddba2237d72a",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,8 @@
+//
+//  Override.xcconfig
+//  suit
+//
+//  Created by pmacro on 18/05/2018.
+//
+
+MACOSX_DEPLOYMENT_TARGET=10.12

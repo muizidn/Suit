@@ -1,0 +1,1 @@
+swift build -Xcc -I/usr/local/Cellar/pango/1.42.1/include/pango-1.0 -Xcc -I/usr/local/Cellar/glib/2.56.1/include/glib-2.0 -Xcc -I/usr/local/Cellar/glib/2.56.1/lib/glib-2.0/include -Xcc -I/usr/local/opt/gettext/include -Xcc -I/usr/local/Cellar/pcre/8.42/include -Xcc -I/usr/local/Cellar/fribidi/1.0.2/include/fribidi
