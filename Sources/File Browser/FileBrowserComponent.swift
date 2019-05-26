@@ -110,8 +110,8 @@ public class FileBrowserComponent: CompositeComponent {
 
     buttonBarComponent.view.add(subview: openButton)
     openButton.onPress = { [weak self] in
-      let selection = self?.fileListComponent.currentDirectory
-                   ?? self?.fileListComponent.highlightedFile
+      let selection = self?.fileListComponent.highlightedFile
+                      ?? self?.fileListComponent.currentDirectory
       
       if let selection = selection {
         self?.fileListComponent.onSelection([selection])
