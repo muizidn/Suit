@@ -1,4 +1,4 @@
-![alt text](./suit_banner.png "Suit: Swift cross platform UI framework")
+![alt text](./PromoImages/suit_banner.png "Suit: Swift cross platform UI framework")
 
 # What is Suit?
 Suit is a pure Swift GUI toolkit.  It's been designed from the start to be cross-platform, and supports both macOS and Linux, today, with further platforms planned for the future, including mobile OSes.
@@ -19,7 +19,7 @@ It's been in development for more than a year at this point, and so there has be
 
 # How can I monitor Suit's progress
 
-You can follow me on [Twitter](https://twitter.com/saniceadonut), where I post frequent progress updates for both Suit and Stride.
+You can follow me on [Twitter](https://twitter.com/saniceadonut), where I post frequent progress updates for both Suit and Stride.  Hopefully the project will gain other contributors over time and I will no longer be a single contact point for the projects.
 
 # Can I help?
 
