@@ -37,6 +37,7 @@ At this point we have an executable project with Suit available for import.  Swi
 
 - Create a new file called RootComponent.swift inside Sources/$YOUR_PROJECT_NAME/.
 - Paste in the following:
+
         import Foundation
         import Suit
     
@@ -57,6 +58,7 @@ At this point we have an executable project with Suit available for import.  Swi
         }
     
 - Now open main.swift and paste in the following:
+
         import Foundation
         import Suit
         
@@ -71,6 +73,7 @@ At this point we have an executable project with Suit available for import.  Swi
 Now we simply need to build and run our new app.  In order to do that we need to pass some arguments to the Swift compiler so it can find some dependencies.  To find the correct path(s) on your environment and then build, run the following from your project's root directory:
 
 - Linux
+
         export YOGA_LIB_PATH=$PWD/$(find . -wholename '*/Sources/Yoga/linux*' | head -n 1)
         export   CLIPBOARD_LIB_PATH=$PWD/$(find . -wholename '*/Sources/CClipboard' | head -n 1)
 
