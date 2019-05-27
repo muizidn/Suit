@@ -212,8 +212,14 @@ open class View: Hashable,
     return lhs.hashValue == rhs.hashValue
   }
 
+  ///
+  /// Invoked just before this view attaches to a window.  Subclasses should call super.
+  ///
   open func willAttachToWindow(){}
 
+  ///
+  /// Invoked just after this view attaches to a window.  Subclasses should call super.
+  ///
   open func didAttachToWindow() {
     willAttachToWindow()
     subviews.forEach {
@@ -248,6 +254,9 @@ open class View: Hashable,
     }
   }
 
+  ///
+  /// Removes this view from its parent.
+  ///
   public func removeFromSuperview() {
     if let superview = superview,
       let index = superview.subviews.firstIndex(where: { $0 == self }) {
@@ -272,6 +281,9 @@ open class View: Hashable,
 
   // MARK: - Layout methods
 
+  ///
+  /// Invalidates this view's layout, i.e. the layout of all subviews contained within this view.
+  ///
   public func invalidateLayout() {
     if useLayoutEngine {
       if subviews.isEmpty {
@@ -294,6 +306,10 @@ open class View: Hashable,
 
   // MARK: - Drawing methods
 
+  ///
+  /// Ensures that the `graphics` property is set to a valid value, returning false if it could
+  /// not set it to a valid value.
+  ///
   internal func ensureGraphics() -> Bool {
     guard let window = window else { return false }
 
@@ -556,10 +572,8 @@ open class View: Hashable,
   open func updateAppearance(style: AppearanceStyle) {}
   
   ///
-  /// Generates the list of properties for animation.
+  /// Generates the list of properties for animation, appending to the passed-in `properties` value.
   ///
-  // This needs work: `type` is only used to provide the type of self in a static way so
-  // we can generate the correct AnimatableProperties<?> type.
   public func generateAnimatableProperties<T>(in properties: AnimatableProperties<T>) {
     if let properties = properties as? AnimatableProperties<View> {
       properties.add(\.background.borderSize)
