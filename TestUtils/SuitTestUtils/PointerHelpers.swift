@@ -30,4 +30,15 @@ extension PointerEvent {
                              dragStartingPoint: nil)
     view.onPointerEvent(event)
   }
+  
+  public static func enter(view: View) {
+    let event = PointerEvent(type: .enter,
+                             eventCount: 1,
+                             phase: .unknown,
+                             deltaX: 0,
+                             deltaY: 0,
+                             location: view.frame.origin,
+                             dragStartingPoint: nil)
+    view.onPointerEvent(event)
+  }
 }

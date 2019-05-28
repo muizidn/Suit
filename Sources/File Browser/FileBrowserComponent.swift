@@ -15,7 +15,7 @@ public class FileBrowserComponent: CompositeComponent {
   
   /// The component that displays the list of files in a given directory.
   let fileListComponent: FileListComponent
-  
+    
   ///
   /// Opens the file browser component according to the supplied configuration.
   ///
@@ -110,16 +110,16 @@ public class FileBrowserComponent: CompositeComponent {
 
     buttonBarComponent.view.add(subview: openButton)
     openButton.onPress = { [weak self] in
-      let selection = self?.fileListComponent.highlightedFile
-                      ?? self?.fileListComponent.currentDirectory
-      
-      if let selection = selection {
+      if let selection = self?.fileListComponent.activeURL {
         self?.fileListComponent.onSelection([selection])
         self?.view.window.close()
       }
     }
     
-    print("Opening file browser in directory: \(FileManager.default.homeDirectoryForCurrentUser)")
+    fileListComponent.onContextChange = { [weak self] in
+      openButton.isEnabled = self?.fileListComponent.hasValidURLContext ?? false
+    }
+    
     fileListComponent.show(directory: FileManager.default.homeDirectoryForCurrentUser)
   }
   

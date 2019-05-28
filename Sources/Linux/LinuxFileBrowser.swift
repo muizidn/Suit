@@ -5,7 +5,7 @@
 //  Created by pmacro  on 29/01/2019.
 //
 
-#if os(Linux)
+#if os(macOS)
 
 import Foundation
 

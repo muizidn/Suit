@@ -60,6 +60,11 @@ public struct Colour: Equatable, Codable, ExpressibleByIntegerLiteral {
     return Appearance.current == .light ? darkTextColor
                                         : lightTextColor
   }
+  
+  /// The default text color for disabled content for the current appearance state.
+  public static var disabledTextColor: Color {
+    return .lightGray
+  }
 
   /// The text area background color for light appearances.
   public static var lightTextAreaBackgroundColor = Color(red: 1,

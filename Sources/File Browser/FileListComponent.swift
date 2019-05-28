@@ -15,7 +15,22 @@ public class FileListComponent: ListComponent {
   var currentDirectory: URL?  
   var highlightedFile: URL?
   
+  /// The current URL context: either a specificially highlighted file, or the directory we're currently in.
+  var activeURL: URL? {
+    return highlightedFile ?? currentDirectory
+  }
+  
+  /// Is the activeURL a valid selection?  I.e. do we allow the user to select the
+  /// current dir or highlighted file?
+  var hasValidURLContext: Bool {
+    guard let selection = activeURL else { return false }
+    return isSelectable(selection)
+  }
+  
   var currentDirectoryChildren: [URL]?
+  
+  typealias OnContextChange = () -> Void
+  var onContextChange: OnContextChange?
   
   let onSelection: FileSelectionAction
   let onCancel: FileSelectionCancellationAction?
@@ -54,6 +69,7 @@ public class FileListComponent: ListComponent {
     listView?.onHighlight = { [weak self] indexPath, cell in
       if let cell = cell as? FileListItemCell {
         self?.highlightedFile = cell.url
+        self?.onContextChange?()
       }
     }
   }
@@ -61,6 +77,19 @@ public class FileListComponent: ListComponent {
   override public func updateAppearance(style: AppearanceStyle) {
     super.updateAppearance(style: style)
     view.background.color = .textAreaBackgroundColor
+  }
+  
+  ///
+  /// Determines whether or not `url` is selectable according to the restrictions set on this
+  /// file list.
+  ///
+  func isSelectable(_ url: URL) -> Bool {
+    if !permittedFileTypes.isEmpty {
+      return permittedFileTypes
+        .contains(where: { ("/" + url.lastPathComponent).hasSuffix($0) })
+    } else {
+      return isSelectingDirectory && url.hasDirectoryPath
+    }
   }
   
   func popDirectory() {
@@ -79,13 +108,13 @@ public class FileListComponent: ListComponent {
     defer { 
       super.reload() 
       listView?.embeddingScrollView?.scrollToTop()
+      onContextChange?()
     }
     
     guard let currentDirectory = currentDirectory else {
       currentDirectoryChildren = nil
       return
     }
-    print("currentDirectory = \(currentDirectory)")
 
     currentDirectoryChildren =
       try? FileManager.default.contentsOfDirectory(atPath: currentDirectory.path)
@@ -116,6 +145,12 @@ public class FileListComponent: ListComponent {
                           .contains(where: { ("/" + type).hasSuffix($0) })
     } else {
       cell.isSelectable = isSelectingDirectory && cell.url?.hasDirectoryPath == true
+    }
+    
+    if let url = cell.url {
+      cell.isSelectable = isSelectable(url)
+    } else {
+      cell.isSelectable = true
     }
         
     return cell

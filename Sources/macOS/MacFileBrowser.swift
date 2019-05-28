@@ -5,7 +5,7 @@
 //  Created by pmacro on 22/06/2018.
 //
 
-#if os(macOS)
+#if os(Linux)
 
 import Foundation
 import AppKit

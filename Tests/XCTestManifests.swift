@@ -16,7 +16,9 @@ extension ButtonTests {
     //   `swift test --generate-linuxmain`
     // to regenerate.
     static let __allTests__ButtonTests = [
+        ("testButtonDisablement", testButtonDisablement),
         ("testButtonPress", testButtonPress),
+        ("testButtonRolloverStateChange", testButtonRolloverStateChange),
         ("testClickOnButtonButReleaseOutsideButton", testClickOnButtonButReleaseOutsideButton),
     ]
 }

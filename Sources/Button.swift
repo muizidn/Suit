@@ -60,6 +60,25 @@ open class Button: View {
     case unfocused
     case focused
     case pressed
+    case disabled
+  }
+  
+  /// Sets whether the button is enabled (and pressable) or disabled.
+  public var isEnabled: Bool {
+    get {
+      return state != .disabled
+    }
+    
+    // Swap the state between disabled and unfocused if the state is being changed.
+    set (isBeingEnabled) {
+      defer { forceRedraw() }
+      if isBeingEnabled == isEnabled {
+        return
+      }
+      else {
+        state = isBeingEnabled ? .unfocused : .disabled
+      }
+    }
   }
 
   /// The current button state.
@@ -73,7 +92,10 @@ open class Button: View {
   
   /// The image to be displayed when the button is pressed.
   var pressedImage: Image?
-  
+
+  /// The image to be displayed when the button is disabled.
+  var disabledImage: Image?
+
   /// The type of button used as this button's template.
   private (set) public var type: ButtonType = .default
   
@@ -85,6 +107,9 @@ open class Button: View {
   
   /// The foreground color when this button is pressed.
   var pressedForegroundColor: Color = Color.black
+  
+  /// The foreground color when this button is disabled.
+  var disabledForegroundColor: Color = Color.black
 
   /// The background color when this button is not focused.
   var unfocusedBackground: Background?
@@ -95,6 +120,9 @@ open class Button: View {
   /// The background color when this button is pressed.
   var pressedBackground: Background?
 
+  /// The background color when this button is disabled.
+  var disabledBackground: Background?
+
   /// The highlight ring when this button is not focused.
   fileprivate var unfocusedHighlightRing: ButtonHighlightRing?
   
@@ -103,6 +131,9 @@ open class Button: View {
   
   /// The highlight ring when this button is pressed.
   fileprivate var pressedHighlightRing: ButtonHighlightRing?
+  
+  /// The highlight ring when this button is disabled.
+  fileprivate var disabledHighlightRing: ButtonHighlightRing?
   
   /// The image view that is rendered inside the button.  You can configure this view
   /// like any other, adjusting its layout, background etc.
@@ -181,7 +212,8 @@ open class Button: View {
         set(foregroundColor: .textColor, forState: .unfocused)
         set(foregroundColor: .textColor, forState: .pressed)
         set(foregroundColor: .textColor, forState: .focused)
-
+        set(foregroundColor: .disabledTextColor, forState: .disabled)
+        
         buttonBackground.color = style == .light ? .lighterGray : .darkGray
         buttonBackground.cornerRadius = 8
         buttonBackground.borderSize = 0.1
@@ -193,6 +225,7 @@ open class Button: View {
         set(foregroundColor: .lightTextColor, forState: .unfocused)
         set(foregroundColor: .lightTextColor, forState: .pressed)
         set(foregroundColor: .lightTextColor, forState: .focused)
+        set(foregroundColor: .disabledTextColor, forState: .disabled)
 
         var highlightRing = ButtonHighlightRing()
         highlightRing.size = 0.1
@@ -213,6 +246,7 @@ open class Button: View {
 
         focusedBackground = buttonBackground
         unfocusedBackground = buttonBackground
+        disabledBackground = buttonBackground
 
         buttonBackground.color = style == .light ? .darkGray : .lightGray
         pressedBackground = buttonBackground
@@ -220,6 +254,7 @@ open class Button: View {
         set(foregroundColor: .textColor, forState: .unfocused)
         set(foregroundColor: .white, forState: .pressed)
         set(foregroundColor: .textColor, forState: .focused)
+        set(foregroundColor: .disabledTextColor, forState: .disabled)
         
         var background = Background()
         background.borderSize = 0.4
@@ -232,7 +267,8 @@ open class Button: View {
         titleLabel.verticalArrangement = .center
         unfocusedBackground = background
         focusedBackground = background
-
+        disabledBackground = background
+        
         var pressed = background
         pressed.color = .highlightedCellColor
         pressedBackground = pressed
@@ -258,6 +294,8 @@ open class Button: View {
         unfocusedImage = image
       case .pressed?:
         pressedImage = image
+      case .disabled?:
+        disabledImage = image
       default:
         focusedImage = image
         unfocusedImage = image
@@ -277,6 +315,8 @@ open class Button: View {
         unfocusedForegroundColor = foregroundColor
       case .pressed?:
         pressedForegroundColor = foregroundColor
+      case .disabled?:
+        disabledForegroundColor = foregroundColor
       default:
         focusedForegroundColor = foregroundColor
         unfocusedForegroundColor = foregroundColor
@@ -296,6 +336,8 @@ open class Button: View {
         unfocusedBackground = backgroundConfiguration
       case .pressed?:
         pressedBackground = backgroundConfiguration
+      case .disabled?:
+        disabledBackground = backgroundConfiguration
       default:
         focusedBackground = backgroundConfiguration
         unfocusedBackground = backgroundConfiguration
@@ -312,6 +354,8 @@ open class Button: View {
         unfocusedHighlightRing = highlightRing
       case .pressed:
         pressedHighlightRing = highlightRing
+      case .disabled:
+        disabledHighlightRing = highlightRing
     }
   }
   
@@ -331,6 +375,9 @@ open class Button: View {
       case .pressed:
         imageView.image = pressedImage
         titleLabel.textColor = pressedForegroundColor
+      case .disabled:
+        imageView.image = disabledImage
+        titleLabel.textColor = disabledForegroundColor
     }
   }
 
@@ -351,6 +398,9 @@ open class Button: View {
       case .pressed:
         background = pressedBackground ?? background
         highlightRing = pressedHighlightRing
+      case .disabled:
+        background = disabledBackground ?? background
+        highlightRing = disabledHighlightRing
     }
 
     super.drawBackground(rect: rect)
@@ -372,7 +422,7 @@ open class Button: View {
   override func onPointerEvent(_ pointerEvent: PointerEvent) -> Bool {
     let wasConsumed = super.onPointerEvent(pointerEvent)
 
-    if wasConsumed {
+    if wasConsumed || !isEnabled {
       return wasConsumed
     }
 
