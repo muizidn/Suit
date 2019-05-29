@@ -47,6 +47,7 @@ At this point we have an executable project with Suit available for import.  Swi
 - Create a new file called RootComponent.swift inside Sources/$YOUR_PROJECT_NAME/.
 - Paste in the following:
 
+```swift
         import Foundation
         import Suit
     
@@ -65,9 +66,11 @@ At this point we have an executable project with Suit available for import.  Swi
             view.justifyContent = .center
           }    
         }
+```
     
 - Now open main.swift and paste in the following:
 
+```swift
         import Foundation
         import Suit
         
@@ -78,6 +81,7 @@ At this point we have an executable project with Suit available for import.  Swi
                                           height: 600),
                             hasTitleBar: true)
         Application.create(with: window).launch() 
+```
 
 Now we simply need to build and run our new app.  In order to do that we need to pass some arguments to the Swift compiler so it can find some dependencies.  To find the correct path(s) on your environment and then build, run the following from your project's root directory:
 
