@@ -673,8 +673,13 @@ open class TextAreaView: View {
     }
     
     // Scroll to the column we're dragging at.
-    if let scrollColumn = self.convertOffsetToLinePosition(offset)?.column {
-      scroll(toColumn: scrollColumn, onLine: currentLine)
+    if let scrollColumn = self.convertOffsetToLinePosition(offset)?.column,
+       let currentColumn = currentColumn {
+      if scrollColumn > currentColumn {
+        scrollToColumnIfOffscreen(currentColumn + 1, onLine: currentLine)
+      } else if scrollColumn < currentColumn {
+        scrollToColumnIfOffscreen(currentColumn - 1, onLine: currentLine)
+      }
     }
     
     let selectionEndPoint = pointerPoint
@@ -721,23 +726,28 @@ open class TextAreaView: View {
     let line = state.text[range]
     let lineToMeasure = line.trimmingCharacters(in: .whitespacesAndNewlines)
 
-    let minWidth = max(bounds.width, embeddingScrollView?.frame.width ?? 0)
-    var lineBox = graphics.size(of: lineToMeasure.isEmpty ? "||" : String(line).trimmingCharacters(in: .newlines), wrapping: .none)
-    lineBox.size.width = max(minWidth, lineBox.size.width)
+    let lineBox = graphics.size(of: lineToMeasure.isEmpty ? "||"
+                                                          : String(line).trimmingCharacters(in: .newlines),
+                                wrapping: .none)
 
     var existingLineBox = lineRectCache[lineNumber - 1]
-    existingLineBox.size.width = frame.width
+    existingLineBox.size.width = lineBox.width
 
     let minAreaHeight = max(lineBox.size.height, existingLineBox.size.height)
     existingLineBox.size.height = minAreaHeight
 
     self.lineRectCache[lineNumber - 1] = existingLineBox
 
-    let newWidth = max(self.frame.width,
-                       lineBox.size.width + renderer.activeGutterWidth + insets.left + insets.right)
+    let scrollerWidth = embeddingScrollView?.verticalScroller?.frame.width ?? 0
 
-    if self.width.unit == .point || self.width.unit == .auto, newWidth > self.frame.width {
+    let newWidth = max(self.frame.width,
+                       lineBox.size.width + renderer.activeGutterWidth
+                        + insets.left + insets.right + scrollerWidth)
+
+    if self.width.unit == .point || self.width.unit == .auto, Float(newWidth) > self.width.value {
       self.width = max(newWidth, CGFloat(self.width.value))~
+      window.rootView.invalidateLayout()
+      forceRedraw()
     }
   }
 
@@ -788,8 +798,12 @@ open class TextAreaView: View {
 
     self.height = height~
 
+    let scrollerWidth = embeddingScrollView?.verticalScroller?.frame.width ?? 0
+    let newWidth = max(self.frame.width,
+                       width + renderer.activeGutterWidth + insets.left + insets.right + scrollerWidth)
+
     if self.width.unit == .point || self.width.unit == .auto, width > self.frame.width {
-      self.width = max(width, CGFloat(self.width.value))~
+      self.width = max(newWidth, CGFloat(self.width.value))~
     }
   }
 
@@ -1612,7 +1626,7 @@ extension TextAreaView {
   @discardableResult
   func scrollToColumnIfOffscreen(_ column: Int, onLine line: Int) -> Bool {
     if !visibleColumns(onLine: line).contains(column) {
-     scroll(toColumn: column, onLine: line, position: .right)
+     scroll(toColumn: column, onLine: line, position: .center)
      return true
     }
     return false
