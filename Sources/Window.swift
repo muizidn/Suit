@@ -175,6 +175,7 @@ open class Window: KeyEventDelegate, PointerEventDelegate {
     platformWindowDelegate.updateWindow()
   }
 
+  @discardableResult
   open func onKeyEvent(_ keyEvent: KeyEvent) -> Bool {
     if let windowKeyEventDelegate = platformWindowDelegate as? KeyEventDelegate {
       _ = windowKeyEventDelegate.onKeyEvent(keyEvent)
@@ -258,6 +259,7 @@ open class Window: KeyEventDelegate, PointerEventDelegate {
     platformWindowDelegate?.updateWindow(rect: rect)
   }
 
+  @discardableResult
   open func onPointerEvent(_ pointerEvent: PointerEvent) -> Bool {
 
     // Close any child windows when the user clicks on the main window.  This behaviour

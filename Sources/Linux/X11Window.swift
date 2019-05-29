@@ -169,7 +169,7 @@ extension X11Window: PlatformWindowDelegate {
 
   @usableFromInline
   func hideWindowDecorations() {
-    let property = XInternAtom(display, "_MOTIF_WM_HINTS", Int32(true))
+    let property = XInternAtom(display, "_MOTIF_WM_HINTS", 1) // 1 == true here
 
     struct Hints {
       let flags: CUnsignedLong
@@ -320,7 +320,7 @@ extension X11Window: PlatformWindowDelegate {
       client.withMemoryRebound(to: XEvent.self, capacity: capacity) { (event: UnsafePointer<XEvent>) -> Void in
         XSendEvent(display, 
                    XDefaultRootWindow(display),
-                   Int32(false),
+                   0, // false
                    SubstructureRedirectMask | SubstructureNotifyMask,
                    UnsafeMutablePointer(mutating: event))
         return
