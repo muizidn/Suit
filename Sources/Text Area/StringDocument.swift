@@ -147,18 +147,10 @@ open class StringDocument: ExpressibleByStringLiteral {
   /// Recalculate the state from scratch, throwing away any caches.
   ///
   func recalculateState() {
-    // var start = Date()
     lineCharacterRanges = calculateUTF8LineRanges()
     lineRangesCache = [:]
-    // print("calculateLinesRanges took:\(Date().timeIntervalSince(start))s")
-
-    // start = Date()
     numberOfLines = lineCharacterRanges.count
-    // print("numberOfLines took:\(Date().timeIntervalSince(start))s")
-
-    // start = Date()
     recalculateAttributesByLine()
-    // print("recalculateAttributesByLine took:\(Date().timeIntervalSince(start))s")
   }
 
   ///
@@ -170,10 +162,10 @@ open class StringDocument: ExpressibleByStringLiteral {
     let lfcr = 0x0A0D
     
     #if swift(>=5.1)
-    buffer.withUTF8 { fatalError("Switch to this API!") }
-    #else
-    buffer.makeNativeUTF8IfNeeded()
+    print("Swift 5.1 is being used.  Switch to using buffer.withUTF8")
     #endif
+    
+    buffer.makeNativeUTF8IfNeeded()
 
     // FIXME TODO!!  Switch to buffer.withUTF8 once Swift 5.1 is available as this can fail.
     //
