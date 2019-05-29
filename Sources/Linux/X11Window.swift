@@ -152,11 +152,19 @@ extension X11Window: PlatformWindowDelegate {
       adjustedPoint.y += parentPosition.y
     }
 
+    // TODO: this is an awful hack :-( 
+    // These are observed values found through debugging.
+    // Without these adjustments, window movements are 
+    // off by these amounts.  I'm yet to figure out why this
+    // is necessary, but better to have it functioning correctly
+    // in the meantime.
+    let xAdjustment: CGFloat = 10
+    let yAdjustment: CGFloat = 8
+
     XMoveWindow(display,
                 realX11Window,
-                Int32(adjustedPoint.x * scale),
-                Int32(adjustedPoint.y * scale))
-    XFlush(display)
+                Int32((adjustedPoint.x + xAdjustment) * scale),
+                Int32((adjustedPoint.y + yAdjustment) * scale))
   }
 
   @usableFromInline
