@@ -87,7 +87,7 @@ public class X11Application: Application {
     let frame = window.rootView.frame
     window.parentWindow = parentWindow
 
-    let x11Window = X11Window(window: window)
+    let x11Window = X11Window(window: window, display: display)
     window.x11Window = x11Window
     window.platformWindowDelegate = x11Window
     x11Window.hideWindowDecorations()
@@ -140,6 +140,7 @@ public class X11Application: Application {
   }
 
   func handle(event: XEvent) {
+
     switch event.type {
       case Expose:
         guard let window = findWindow(forNativePointer: event.xexpose.window) else { return }
@@ -148,9 +149,12 @@ public class X11Application: Application {
         window.x11Window.update(rect: window.rootView.frame)
       case ConfigureNotify:
         guard let window = findWindow(forNativePointer: event.xconfigure.window) else { return }
-
-        window.rootView.width = CGFloat(event.xconfigure.width)~
-        window.rootView.height = CGFloat(event.xconfigure.height)~
+        let scale = window.x11Window.scale
+        let width = CGFloat(event.xconfigure.width) / scale
+        let height = CGFloat(event.xconfigure.height) / scale
+        
+        window.rootView.width = width~
+        window.rootView.height = height~
         let x11Window = window.x11Window!
 
         let screen = XDefaultScreen(x11Window.display)
@@ -175,9 +179,11 @@ public class X11Application: Application {
 
       case ButtonPress:
         guard let window = findWindow(forNativePointer: event.xbutton.window) else { return }
+        let scale = window.x11Window.scale
+
         var pointerEvent = PointerEvent()
-        pointerEvent.location = CGPoint(x: CGFloat(event.xbutton.x / window.x11Window.scale),
-                                        y: CGFloat(event.xbutton.y / window.x11Window.scale))
+        pointerEvent.location = CGPoint(x: CGFloat(event.xbutton.x) / scale,
+                                        y: CGFloat(event.xbutton.y) / scale)
 
         // TODO this is temporary, rudimentary, scrolling support.
         if event.xbutton.button == Button5 {
@@ -205,10 +211,12 @@ public class X11Application: Application {
         window.onPointerEvent(pointerEvent)
       case ButtonRelease:
         guard let window = findWindow(forNativePointer: event.xbutton.window) else { return }
+        let scale = window.x11Window.scale
+
         var pointerEvent = PointerEvent()
         pointerEvent.type = .release
-        pointerEvent.location = CGPoint(x: CGFloat(event.xbutton.x / window.x11Window.scale),
-                                        y: CGFloat(event.xbutton.y / window.x11Window.scale))
+        pointerEvent.location = CGPoint(x: CGFloat(event.xbutton.x) / scale,
+                                        y: CGFloat(event.xbutton.y) / scale)
         lastX = nil
         lastX = nil
         dragStartingPoint = nil
@@ -216,15 +224,17 @@ public class X11Application: Application {
         window.onPointerEvent(pointerEvent)
       case MotionNotify:
         guard let window = findWindow(forNativePointer: event.xmotion.window) else { return }
+        let scale = window.x11Window.scale
+
         pointerEventThrottler.add {
         var pointerEvent = PointerEvent()
         pointerEvent.type = self.isMouseDown ? .drag : .move
-        pointerEvent.location = CGPoint(x: CGFloat(event.xmotion.x / window.x11Window.scale),
-                                        y: CGFloat(event.xmotion.y / window.x11Window.scale))
+        pointerEvent.location = CGPoint(x: CGFloat(event.xmotion.x) / scale,
+                                        y: CGFloat(event.xmotion.y) / scale)
 
         if let lastX = self.lastX, let lastY = self.lastY {
-          pointerEvent.deltaX = CGFloat((event.xmotion.x_root - lastX) / window.x11Window.scale)
-          pointerEvent.deltaY = CGFloat((lastY - event.xmotion.y_root) / window.x11Window.scale)
+          pointerEvent.deltaX = CGFloat(event.xmotion.x_root - lastX) / scale
+          pointerEvent.deltaY = CGFloat(lastY - event.xmotion.y_root) / scale
         }
 
         self.lastX = event.xmotion.x_root

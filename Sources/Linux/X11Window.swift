@@ -16,7 +16,9 @@ public class X11Window {
   var display: OpaquePointer!
   var backBuffer: Drawable!
   var updateCount = 0
-  let scale: Int32 = 1
+
+  let scale: CGFloat
+
   var graphicsContext: OpaquePointer!
 
   var isClosed: Bool = false
@@ -26,9 +28,11 @@ public class X11Window {
 
   /// A GTK-style menu for the window.
   var gtkMenu: GtkStyleMenu?
-  
-  public init(window: Window) {
+
+  public init(window: Window, display: OpaquePointer!) {
     self.window = window
+    self.display = display
+    self.scale = DisplayUtils.getScaleFactor(forDisplay: display)
     surface = createSurface()!
   }
 
@@ -42,26 +46,24 @@ public class X11Window {
     window.rootView.draw(dirtyRect: rect)
 
     XCopyArea(display,
-                     backBuffer,
-                     realX11Window,
-                     graphicsContext,
-                     Int32(rect.origin.x),
-                     Int32(rect.origin.y),
-                     UInt32(rect.width),
-                     UInt32(rect.height),
-                     Int32(rect.origin.x),
-                     Int32(rect.origin.y)
-                    )
+              backBuffer,
+              realX11Window,
+              graphicsContext,
+              Int32(rect.origin.x * scale),
+              Int32(rect.origin.y * scale),
+              UInt32(rect.width * scale),
+              UInt32(rect.height * scale),
+              Int32(rect.origin.x * scale),
+              Int32(rect.origin.y * scale)
+    )
     XFlush(display)
   }
 
   func createSurface() -> OpaquePointer? {
-    self.display = (Application.shared as! X11Application).display
-
-    let x = Int32(window.rootView.frame.origin.x)
-    let y = Int32(window.rootView.frame.origin.y)
-    let width = Int32(window.rootView.frame.size.width) * scale
-    let height = Int32(window.rootView.frame.size.height) * scale
+    let x = Int32(window.rootView.frame.origin.x * scale)
+    let y = Int32(window.rootView.frame.origin.y * scale)
+    let width = UInt32(window.rootView.frame.size.width * scale)
+    let height = UInt32(window.rootView.frame.size.height * scale)
 
     let screen = XDefaultScreen(display)
     let parent = XDefaultRootWindow(display)
@@ -70,8 +72,8 @@ public class X11Window {
                                         parent,
                                         x,
                                         y,
-                                        UInt32(width),
-                                        UInt32(height),
+                                        width,
+                                        height,
                                         0,
                                         0,
                                         XWhitePixel(display, screen))
@@ -89,8 +91,8 @@ public class X11Window {
     let surface = cairo_xlib_surface_create(display, 
                                             backBuffer, 
                                             XDefaultVisual(display, screen), 
-                                            width, 
-                                            height)
+                                            Int32(width), 
+                                            Int32(height))
     return surface
   }
 
@@ -132,7 +134,8 @@ extension X11Window: PlatformWindowDelegate {
 
     XGetWindowAttributes(tempDisplay, realX11Window, &xwa)
     XCloseDisplay(tempDisplay)
-    return CGPoint(x: CGFloat(x - xwa.x), y: CGFloat(y - xwa.y))
+
+    return CGPoint(x: CGFloat(x - xwa.x) / scale, y: CGFloat(y - xwa.y) / scale)
   }
 
   @usableFromInline
@@ -151,8 +154,8 @@ extension X11Window: PlatformWindowDelegate {
 
     XMoveWindow(display,
                 realX11Window,
-                Int32(adjustedPoint.x),
-                Int32(adjustedPoint.y))
+                Int32(adjustedPoint.x * scale),
+                Int32(adjustedPoint.y * scale))
     XFlush(display)
   }
 
@@ -242,9 +245,12 @@ extension X11Window: PlatformWindowDelegate {
 
     var xwa = XWindowAttributes()
     XGetWindowAttributes(display, parent, &xwa)
+
     let viewWidth = window.rootView.frame.width
-    move(to: CGPoint(x: (CGFloat(xwa.width) - viewWidth) / 2,
-                     y: (CGFloat(xwa.height) - window.rootView.frame.height) / 2))
+    let viewHeight = window.rootView.frame.height
+
+    move(to: CGPoint(x: ((CGFloat(xwa.width) / scale) - viewWidth) / 2,
+                     y: ((CGFloat(xwa.height) / scale) - viewHeight) / 2))
   }
 
   @usableFromInline
@@ -314,4 +320,5 @@ extension X11Window: PlatformWindowDelegate {
     }
   }
 }
+
 #endif
