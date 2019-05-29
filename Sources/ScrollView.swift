@@ -8,10 +8,16 @@
 
 import Foundation
 
-public enum ScrollPosition {
+public enum VerticalScrollPosition {
   case top
   case middle
   case bottom
+}
+
+public enum HorizontalScrollPosition {
+  case left
+  case center
+  case right
 }
 
 protocol Scrollable {
@@ -384,17 +390,17 @@ class Scroller: View {
       let location = windowCoordinatesInViewSpace(from: event.location)
       
       if isHorizontal {
-        // The scroll should feel like it's centerd on the point in the scroller that
+        // The scroll should feel like it's centered on the point in the scroller that
         // is grabbed, so we need to find the position the scroller where the pointer
         // is and include that in any events.
-        let positionOnXScroller = (location.x - frame.origin.x) - frame.width
+        let positionOnXScroller = location.x - frame.width
         // The X delta is the difference between the position of the scroller,
         // the position of the pointer, adding the position on the scroller.
         let x = frame.origin.x - (location.x + positionOnXScroller)
         event.deltaX = x
         event.deltaY = 0
       } else {
-        let positionOnYScroller = (location.y - frame.origin.y) - frame.height
+        let positionOnYScroller = location.y - frame.height
         let y = frame.origin.y - (location.y + positionOnYScroller)
         
         event.deltaY = y

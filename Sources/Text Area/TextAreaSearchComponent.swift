@@ -176,7 +176,7 @@ class TextAreaSearchComponent: Component {
     
     let range = activeSearchResults[index]
     if let line = textArea?.convertOffsetToLinePosition(range.lowerBound)?.line {
-      textArea?.scroll(to: line)
+      textArea?.scroll(toLine: line)
       textArea?.select(range: range)
     }
   }

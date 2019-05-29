@@ -344,8 +344,9 @@ open class View: Hashable,
 
   public func windowCoordinatesInViewSpace(from: CGPoint) -> CGPoint {
     var converted = from
-    var parent = superview
-    while parent != nil {
+    var parent: View? = self
+    
+    while parent != nil {      
       converted.x -= parent!.frame.origin.x
       converted.x -= parent!.bounds.origin.x
       converted.x -= parent!.insets.left

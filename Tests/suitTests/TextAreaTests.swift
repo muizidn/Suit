@@ -195,8 +195,7 @@ class TextAreaTests: XCTestCase {
     // Test double click at the end of the document.
     let endIndex = simpleTextArea.state.text.endIndex
     _ = simpleTextArea.onPointerEvent(clickEvent(simpleTextArea.location(forIndex: endIndex), 2))
-    XCTAssertNotNil(simpleTextArea.selectedRange)
-    XCTAssert(simpleTextArea.selectedRange?.upperBound == endIndex)
+    XCTAssertNil(simpleTextArea.selectedRange)
   }
   
   /// Tests that click past the end of the line brings the caret to the end of the line.

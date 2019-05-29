@@ -209,9 +209,7 @@ public class ListView: View {
     guard highlightingBehaviour != .none else { return wasConsumed }
     
     if pointerEvent.type == .click {
-      var point = windowCoordinatesInViewSpace(from: pointerEvent.location)
-      point.y -= frame.origin.y
-      point.x -= frame.origin.x
+      let point = windowCoordinatesInViewSpace(from: pointerEvent.location)
       if let child = findChild(atPoint: point) {
         respondToMouseClick(onCell: child)
       }

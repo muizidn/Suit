@@ -79,7 +79,7 @@ public class MacWindow: NSWindow {
   public override func mouseDragged(with event: NSEvent) {
     guard let window = window else { return }
 
-    let dragStart = !isDragging
+    let isDragStart = !isDragging
     isDragging = true
     
     var mouseEvent = PointerEvent()
@@ -89,7 +89,7 @@ public class MacWindow: NSWindow {
     mouseEvent.location = CGPoint(x: mouseLocationOutsideOfEventStream.x,
                                   y: window.rootView.frame.size.height - mouseLocationOutsideOfEventStream.y)
     
-    if dragStart {
+    if isDragStart {
       dragStartingPoint = CGPoint(x: mouseLocationOutsideOfEventStream.x,
                                   y: window.rootView.frame.size.height - mouseLocationOutsideOfEventStream.y)
       mouseEvent.phase = .started

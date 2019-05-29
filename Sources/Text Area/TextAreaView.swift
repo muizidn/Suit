@@ -353,6 +353,9 @@ open class TextAreaView: View {
   
   /// The geometry of each selected line.
   var selectedLineRects = [Int : CGRect]()
+  
+  /// When selecting text via a pointer device, this tracks the point where the selection began.
+  var currentSelectionStartPoint: CGPoint?
 
   public typealias OnTriggerKey = (KeyEvent) -> Void
   public var onTriggerKey: OnTriggerKey?
@@ -381,13 +384,7 @@ open class TextAreaView: View {
 
       let lastLine = lineRectNearest(point: endPoint)
 
-      if let firstLine = firstLine, let lastLine = lastLine {
-
-        // If we can, add an extra line at either side of the visible range
-        // in order to prevent any weird UI glitches as lines go offscreen.
-        let start = max(0, firstLine.0 - 1)
-        let end = min(state.text.numberOfLines, lastLine.0 + 1)
-
+      if let start = firstLine?.0, let end = lastLine?.0 {
         if start < end {
           return start..<end
         }
@@ -396,6 +393,37 @@ open class TextAreaView: View {
     }
 
     return 0..<numberOfLines
+  }
+  
+  public func visibleColumns(onLine line: Int) -> Range<Int> {
+    if let scrollView = embeddingScrollView {
+      let scrollOffsets = scrollView.contentWrapper.bounds.origin
+      
+      let lineRect = lineRectCache[line - 1]
+      
+      let visibleArea = CGRect(x: lineRect.origin.x - scrollOffsets.x,
+                               y: lineRect.origin.y,
+                               width: scrollView.frame.width,
+                               height: lineRect.height)
+      
+      guard let lineRange = state.text.rangeOfLine(line) else {
+        return 0..<0
+      }
+      
+      let start = indexNearest(point: visibleArea.origin) ?? lineRange.lowerBound
+      let end = indexNearest(point: CGPoint(x: visibleArea.origin.x + visibleArea.width,
+                                            y: visibleArea.origin.y)) ?? lineRange.upperBound
+
+      let finalStart = lineRange.contains(start) ? start : lineRange.lowerBound
+      let finalEnd = lineRange.contains(end) ? end : lineRange.upperBound
+      
+      let startCol = state.text.distance(from: lineRange.lowerBound, to: finalStart)
+      let endCol = state.text.distance(from: lineRange.lowerBound, to: finalEnd)
+      
+      return startCol..<endCol
+    }
+    
+    return 0..<(state.text.lineCharacterRanges.last?.upperBound ?? 0)
   }
 
   /// This is used to track whether or not it's safe for us to automatically
@@ -454,12 +482,19 @@ open class TextAreaView: View {
     let positionInfo = convertOffsetToLinePosition(index)
     currentLine = positionInfo?.line
     currentColumn = positionInfo?.column
-
+    
     guard let oldLineNumber = oldLine,
       let currentLineNumber = currentLine,
       selectedLineRects.isEmpty else
     {
       window.redrawManager.redraw(view: self)
+      return
+    }
+    
+    // If the new position is offscreen, we need to scroll to it.  And since the scrolling code
+    // will take care of the redraw, we can exit this function.
+    if scrollToLineIfOffscreen(currentLineNumber) || scrollToColumnIfOffscreen(currentColumn ?? 0,
+                                                                               onLine: currentLineNumber) {
       return
     }
 
@@ -529,6 +564,9 @@ open class TextAreaView: View {
     else if pointerEvent.type == .exit {
       Cursor.shared.pop()
     }
+    else if pointerEvent.type == .release {
+      currentSelectionStartPoint = nil
+    }
 
     return false
   }
@@ -546,6 +584,7 @@ open class TextAreaView: View {
         let rect = rectOfIndicesWithinSingleLine(selectionIndices)
         selectedRange = selectionIndices
         selectedLineRects = [line: rect]
+        currentSelectionStartPoint = rect.origin
         self.position = state.text.distance(from: state.text.startIndex,
                                             to: selectionIndices.lowerBound)
       }
@@ -554,6 +593,7 @@ open class TextAreaView: View {
     else if event.eventCount == 3 {
       if let positionIndex = positionIndex, let line = lineNumber(containing: positionIndex) {
         select(line: line)
+        currentSelectionStartPoint = selectedLineRects[line - 1]?.origin
       }
     }
 
@@ -601,52 +641,55 @@ open class TextAreaView: View {
       self.position = state.text.distance(from: state.text.startIndex, to: offset)
     }
   }
-
+  
   ///
   /// Handle dragging, in particular the dragged selection of text.
   ///
   func handleDrag(_ pointerEvent: PointerEvent) -> Bool {
-    let selectionStartPoint: CGPoint
-
-    // If a selection is already active (on triple-click, for instance), add to it, else
-    // start from the pointer point.
-    if !selectedLineRects.isEmpty {
-      let sortedLineRects = selectedLineRects.sorted { $0.key < $1.key }
-      let firstSelection = sortedLineRects.first
-      guard let rect = firstSelection?.value else { return false }
-      let startPoint = CGPoint(x: rect.origin.x,
-                               y: rect.origin.y + rect.height)
-
-      // If we're dragging bottom-to-top.
-      if let dragStart = pointerEvent.dragStartingPoint,
-        startPoint.y < windowCoordinatesInViewSpace(from: dragStart).y {
-        guard let endRect = sortedLineRects.last?.value else { return false }
-
-        selectionStartPoint = CGPoint(x: endRect.origin.x + endRect.width,
-                                      y: endRect.origin.y + endRect.height)
-      } else { // Top-to-bottom
-        selectionStartPoint = startPoint
-      }
-    } else {
-      guard let windowSelectionStartPoint = pointerEvent.dragStartingPoint else {
-        return false
-      }
-
-      selectionStartPoint = windowCoordinatesInViewSpace(from: windowSelectionStartPoint)
-    }
-
     let pointerPoint = windowCoordinatesInViewSpace(from: pointerEvent.location)
+    let isStartingSelection = currentSelectionStartPoint == nil
+    
+    if isStartingSelection {
+      currentSelectionStartPoint = pointerPoint
+      
+      // If there's an existing selection (from a triple/double click for instance), start from its start point.
+      if !selectedLineRects.isEmpty {
+        currentSelectionStartPoint = selectedLineRects.first?.value.origin
+      }
+    }
+    
+    guard let selectionStartPoint = currentSelectionStartPoint,
+          let currentLine = currentLine,
+          let offset = indexNearest(point: pointerPoint) else { return true }
+    
+    // If the drag is outside the visible lines, scroll to the line nearest the pointer.
+    if let lineNearestPointer = lineRectNearest(point: pointerPoint)?.0 {
+      if lineNearestPointer > currentLine {
+        scrollToLineIfOffscreen(currentLine + 1)
+      }
+      else if lineNearestPointer < currentLine {
+        scrollToLineIfOffscreen(currentLine - 1)
+      }
+    }
+    
+    // Scroll to the column we're dragging at.
+    if let scrollColumn = self.convertOffsetToLinePosition(offset)?.column {
+      scroll(toColumn: scrollColumn, onLine: currentLine)
+    }
+    
     let selectionEndPoint = pointerPoint
-
-    selectedLineRects = lineRectsBetween(startPoint: selectionStartPoint,
-                                         endPoint: selectionEndPoint)
-
-    guard let offset = indexNearest(point: pointerPoint) else { return true }
+    let shouldFlipPoints = selectionEndPoint.y < selectionStartPoint.y
+    
+    let start = shouldFlipPoints ? selectionEndPoint : selectionStartPoint
+    let end = shouldFlipPoints ? selectionStartPoint : selectionEndPoint
+    
+    selectedLineRects = lineRectsBetween(startPoint: start,
+                                         endPoint: end)
 
     position = state.text.distance(from: state.text.startIndex, to: offset)
 
     if let positionIndex = positionIndex,
-      let selectionStartIdx = indexNearest(point: selectionStartPoint) {
+      let selectionStartIdx = indexNearest(point: start) {
       if positionIndex < selectionStartIdx {
         selectedRange = positionIndex..<selectionStartIdx
       } else {
@@ -665,6 +708,7 @@ open class TextAreaView: View {
   open override func didResignAsKeyView() {
     super.didResignAsKeyView()
     caretTimer.stop()
+    currentSelectionStartPoint = nil
   }
 
   func resizeToFitContent(onLine lineNumber: Int) {
@@ -692,7 +736,7 @@ open class TextAreaView: View {
     let newWidth = max(self.frame.width,
                        lineBox.size.width + renderer.activeGutterWidth + insets.left + insets.right)
 
-    if self.width.unit == .point, newWidth > self.frame.width {
+    if self.width.unit == .point || self.width.unit == .auto, newWidth > self.frame.width {
       self.width = max(newWidth, CGFloat(self.width.value))~
     }
   }
@@ -744,7 +788,7 @@ open class TextAreaView: View {
 
     self.height = height~
 
-    if self.width.unit == .point, width > self.frame.width {
+    if self.width.unit == .point || self.width.unit == .auto, width > self.frame.width {
       self.width = max(width, CGFloat(self.width.value))~
     }
   }
@@ -1476,14 +1520,14 @@ extension TextAreaView {
 extension TextAreaView {
 
   ///
-  /// If inside a ScrollView, scrolls the to the specified line according to the behaviour
+  /// If inside a ScrollView, scrolls the text area to the specified line according to the behaviour
   /// described by `position`.
   ///
   /// - parameter line: the line to scroll to.
   /// - parameter position: the position `line` should appear at within the visible portion
   ///  of the view.  Defaults to `middle`.
   ///
-  public func scroll(to line: Int, position: ScrollPosition = .middle) {
+  public func scroll(toLine line: Int, position: VerticalScrollPosition = .middle) {
     guard let scrollView = embeddingScrollView,
       let rect = lineRectCache[safe: line - 1] else { return }
 
@@ -1502,6 +1546,76 @@ extension TextAreaView {
       default: break // top
     }
 
-    scrollView.scroll(to: CGPoint(x: 0, y: yPos))
+    scrollView.scroll(to: CGPoint(x: scrollView.xOffsetTotal, y: yPos))
   }
+  
+  ///
+  /// If inside a ScrollView, scrolls the text area to the specified column according to the behaviour
+  /// described by `position`.  Note that this function does not scroll to `line`, it merely uses `line`
+  /// to locate the column information.
+  ///
+  /// - parameter column: the column to scroll to.
+  /// - parameter line: the line on which the column appears.
+  /// - parameter position: the position `column` should appear at within the visible portion
+  ///  of the view.  Defaults to `middle`.
+  ///
+  public func scroll(toColumn column: Int, onLine line: Int, position: HorizontalScrollPosition = .center) {
+    guard let scrollView = embeddingScrollView,
+          let lineRange = state.text.rangeOfLine(line) else { return }
+    
+    guard state.text.distance(from: lineRange.lowerBound,
+                              to: lineRange.upperBound) >= column else { return }
+    
+    let columnPoint = location(forIndex: state.text.index(lineRange.lowerBound, offsetBy: column))
+    
+    var xPos = columnPoint.x
+    
+    switch position {
+    case .center:
+      if xPos < scrollView.frame.width / 2 {
+        xPos = 0
+      }
+      else {
+        xPos = (scrollView.frame.width / 2) - columnPoint.x
+      }
+    case .right:
+      xPos = scrollView.frame.width - xPos
+    case .left:
+      xPos = -xPos
+    }
+    
+    scrollView.scroll(to: CGPoint(x: xPos, y: scrollView.yOffsetTotal))
+  }
+
+  ///
+  /// If `line` is offscreen, this function will scroll to it (making the minimal scroll movements),
+  /// and return true.  Otherwise this function does nothing but return false.
+  ///
+  @discardableResult
+  func scrollToLineIfOffscreen(_ line: Int) -> Bool {
+    let linesRange = visibleLines.dropFirst()
+    if !linesRange.contains(line) {
+      if line > linesRange.lowerBound {
+        scroll(toLine: line, position: .bottom)
+      } else {
+        scroll(toLine: line, position: .top)
+      }
+      return true
+    }
+    return false
+  }
+  
+  ///
+  /// If `column` is offscreen, this function will scroll to it (making the minimal scroll movements),
+  /// and return true.  Otherwise this function does nothing but return false.
+  ///
+  @discardableResult
+  func scrollToColumnIfOffscreen(_ column: Int, onLine line: Int) -> Bool {
+    if !visibleColumns(onLine: line).contains(column) {
+     scroll(toColumn: column, onLine: line, position: .right)
+     return true
+    }
+    return false
+  }
+
 }
