@@ -47,37 +47,41 @@ At this point we have an executable project with Suit available for import.  Swi
 - Create a new file called RootComponent.swift inside Sources/$YOUR_PROJECT_NAME/.
 - Paste in the following:
 
-        import Foundation
-        import Suit
+```swift
+import Foundation
+import Suit
     
-        class RootComponent: CompositeComponent {
+class RootComponent: CompositeComponent {
     
-          override func viewDidLoad() {
-            super.viewDidLoad()
+override func viewDidLoad() {
+    super.viewDidLoad()
             
-            let helloWorldLabel = Label(text: "Hello, world")
-            helloWorldLabel.font = .ofType(.system, category: .veryLarge)
-            helloWorldLabel.width = 100%
-            helloWorldLabel.height = 30~
-            helloWorldLabel.horizontalArrangement = .center
-            
-            view.add(subview: helloWorldLabel)
-            view.justifyContent = .center
-          }    
-        }
+    let helloWorldLabel = Label(text: "Hello, world")
+    helloWorldLabel.font = .ofType(.system, category: .veryLarge)
+    helloWorldLabel.width = 100%
+    helloWorldLabel.height = 30~
+    helloWorldLabel.horizontalArrangement = .center
+
+    view.add(subview: helloWorldLabel)
+    view.justifyContent = .center
+  }    
+}
+```
     
 - Now open main.swift and paste in the following:
 
-        import Foundation
-        import Suit
+```swift
+import Foundation
+import Suit
         
-        let window = Window(rootComponent: RootComponent(),
+let window = Window(rootComponent: RootComponent(),
                             frame: CGRect(x: 0,
-                                          y: 0,
-                                          width: 800,
-                                          height: 600),
-                            hasTitleBar: true)
-        Application.create(with: window).launch() 
+                                y: 0,
+                            width: 800,
+                           height: 600),
+                      hasTitleBar: true)
+Application.create(with: window).launch() 
+```
 
 Now we simply need to build and run our new app.  In order to do that we need to pass some arguments to the Swift compiler so it can find some dependencies.  To find the correct path(s) on your environment and then build, run the following from your project's root directory:
 
