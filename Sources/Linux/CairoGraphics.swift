@@ -182,11 +182,10 @@ public class CairoGraphics: Graphics {
     pango_layout_get_pixel_size(layout, width, height)
 
     return CGRect(x: 0, 
-                          y: 0,
-                          width: CGFloat(width.pointee),
-                          height: CGFloat(height.pointee))
+                  y: 0,
+                  width: CGFloat(width.pointee),
+                  height: CGFloat(height.pointee))
   }
-  
   
   public func draw(rectangle: CGRect) {
     let rect = translateRectangleToWindowCoordinates(rectangle)
