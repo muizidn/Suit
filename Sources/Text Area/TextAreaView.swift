@@ -1607,6 +1607,8 @@ extension TextAreaView {
   ///
   @discardableResult
   func scrollToLineIfOffscreen(_ line: Int) -> Bool {
+    guard embeddingScrollView != nil else { return false }
+
     let linesRange = visibleLines.dropFirst()
     if !linesRange.contains(line) {
       if line > linesRange.lowerBound {
@@ -1625,6 +1627,7 @@ extension TextAreaView {
   ///
   @discardableResult
   func scrollToColumnIfOffscreen(_ column: Int, onLine line: Int) -> Bool {
+    guard embeddingScrollView != nil else { return false }
     if !visibleColumns(onLine: line).contains(column) {
      scroll(toColumn: column, onLine: line, position: .center)
      return true
