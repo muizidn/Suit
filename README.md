@@ -25,6 +25,15 @@ You can follow me on [Twitter](https://twitter.com/saniceadonut), where I post f
 
 Yes!  You most certainly can!  Please get in touch: pmacro at icloud dot com.
 
+
+# Dependencies
+
+If using Linux you will need to install some dependencies.  For convenience, you can run the install_dependencies_ubuntu.sh script located in the root of this project to install all neccessary dependencies.  If you wish to install these dependencies manually, or are not using a system with 'apt', then simply install the folllowing packages manually:
+
+- libcairo2-dev
+- libpango1.0-dev
+- libxcb-util-dev
+
 # How do I write a Suit app
 
 The easiest way is to download Stride, create a new project, and select the "Suit App" template.  Alternatively, you can create an app outside of Stride as follows:
