@@ -40,6 +40,12 @@ The easiest way is to download Stride, create a new project, and select the "Sui
 
 - Create a new executable Swift project: `swift package init --type=executable`
 - Open the created Package.swift and add Suit as a dependency for your executable target.
+- Set the minimum deployment target for macOS:
+
+      platforms: [
+        .macOS(.v10_13)
+      ]
+
 - Update the Swift package: `swift package update`
 
 At this point we have an executable project with Suit available for import.  Swift Package Manager will have generate a single source file under Sources/$YOUR_PROJECT_NAME/main.swift.  Next, let's create our root component and launch it from main.swift.
