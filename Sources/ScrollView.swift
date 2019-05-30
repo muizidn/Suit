@@ -50,6 +50,9 @@ public class ScrollView: View {
   
   var hideScrollersTimer: RepeatingTimer?
   
+  /// If true, scrollers will be hidden automatically when not in use.  Defaults to false.
+  public var autoHideScrollers = false
+  
   var contentWrapper: View = View()
   weak var scrolledView: View?
   
@@ -110,17 +113,20 @@ public class ScrollView: View {
   
   public override func didAttachToWindow() {
     super.didAttachToWindow()
-    hideScrollersTimer = RepeatingTimer(timeInterval: 2)
-    hideScrollersTimer?.eventHandler = { [weak self] in
-      DispatchQueue.main.async {
-        if self?.verticalScroller?.state != .focused && self?.horizontalScroller?.state != .focused {
-          self?.verticalScroller?.hide()
-          self?.horizontalScroller?.hide()
-          self?.hideScrollersTimer?.stop()
+    
+    if autoHideScrollers {
+      hideScrollersTimer = RepeatingTimer(timeInterval: 2)
+      hideScrollersTimer?.eventHandler = { [weak self] in
+        DispatchQueue.main.async {
+          if self?.verticalScroller?.state != .focused && self?.horizontalScroller?.state != .focused {
+            self?.verticalScroller?.hide()
+            self?.horizontalScroller?.hide()
+            self?.hideScrollersTimer?.stop()
+          }
         }
       }
+      hideScrollersTimer?.start()
     }
-    hideScrollersTimer?.start()
   }
 
   public override func invalidateLayout() {
