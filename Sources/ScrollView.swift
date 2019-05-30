@@ -50,7 +50,7 @@ public class ScrollView: View {
   
   var hideScrollersTimer: RepeatingTimer?
   
-  var contentWrapper: View = View(frame: .zero)
+  var contentWrapper: View = View()
   weak var scrolledView: View?
   
   /// For vertical scrollers, this sets the minimum height of the scroller.  For horizontal scrollers

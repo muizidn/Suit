@@ -17,7 +17,7 @@ class LayoutTests: XCTestCase {
   var rootView: View!
 
   override func setUp() {
-    rootView = View(frame: .zero)
+    rootView = View()
     rootView.flexDirection = .row
     rootView.width = 400~
     rootView.height = 400~
@@ -31,7 +31,7 @@ class LayoutTests: XCTestCase {
   }
   
   func testSingleSubview() {
-    let subview = View(frame: .zero)
+    let subview = View()
     subview.width = 50%
     subview.height = 50%
     
@@ -45,18 +45,18 @@ class LayoutTests: XCTestCase {
   
   func testTwoSiblings() {
     rootView.flexDirection = .column
-    let child1 = View(frame: .zero)
+    let child1 = View()
     child1.width = 100%
     child1.height = 50~
     
-    let child2 = View(frame: .zero)
+    let child2 = View()
     child2.width = 100%
     child2.flexShrink = 1
 
     rootView.add(subview: child1)
     rootView.add(subview: child2)
     
-    let subchild = View(frame: .zero)
+    let subchild = View()
     subchild.width = 25%
     subchild.height = 100%
     
@@ -80,19 +80,19 @@ class LayoutTests: XCTestCase {
   }
   
   func testMultipleRoots() {
-    let root1 = View(frame: .zero)
+    let root1 = View()
     root1.width = 100~
     root1.height = 100~
     
-    let root2 = View(frame: .zero)
+    let root2 = View()
     root2.width = 100~
     root2.height = 100~
     
-    let child1 = View(frame: .zero)
+    let child1 = View()
     child1.width = 50%
     child1.height = 50%
     
-    let child2 = View(frame: .zero)
+    let child2 = View()
     child2.width = 50%
     child2.height = 50%
     

@@ -18,8 +18,8 @@ open class ListComponent: Component, ListViewDatasource {
     }
   }
 
-  override open func loadView(frame: CGRect) {
-    view = ScrollView(frame: frame)
+  override open func loadView() {
+    view = ScrollView()
   }
 
   open override func viewDidLoad() {

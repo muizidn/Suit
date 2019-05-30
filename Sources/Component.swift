@@ -29,7 +29,7 @@ open class Component: Equatable {
     
     get {
       if _view == nil {
-        _view = View(frame: .zero)
+        _view = View()
       }
       return _view!
     }
@@ -51,11 +51,9 @@ open class Component: Equatable {
     identifier = Component.counter
   }
   
-  open func loadView(frame: CGRect) {
+  open func loadView() {
     if _view == nil {
-      _view = View(frame: frame)
-    } else {
-      _view?.frame = frame
+      _view = View()
     }
   }
   
@@ -78,7 +76,7 @@ open class Component: Equatable {
   /// Prepares the component for use.
   ///
   func load(component: Component) {
-    component.loadView(frame: view.bounds)
+    component.loadView()
     component.view.window = view.window
   }
   

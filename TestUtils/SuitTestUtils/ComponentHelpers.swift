@@ -9,7 +9,7 @@ import Foundation
 @testable import Suit
 
 public func load(component: Component, in window: Window) {
-  component.loadView(frame: .zero)
+  component.loadView()
   component.view.window = window
   component.viewDidLoad()
 }

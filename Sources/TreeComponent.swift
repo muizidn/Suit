@@ -52,7 +52,7 @@ open class TreeComponent: Component, TreeViewDataSource {
     }
   }
   
-  override open func loadView(frame: CGRect) {
+  override open func loadView() {
     view = ScrollView()
   }
   

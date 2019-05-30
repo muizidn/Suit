@@ -183,12 +183,6 @@ open class View: Hashable,
     }
   }
 
-  public convenience init(frame: CGRect) {
-    self.init()
-    _frame = frame
-    _bounds = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
-  }
-
   public required init() {
     _frame = .zero
     _bounds = .zero

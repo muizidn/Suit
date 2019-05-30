@@ -114,8 +114,9 @@ open class Window: KeyEventDelegate, PointerEventDelegate {
     titleBarHeight = 41
     #endif
 
-    self.rootView = View(frame: frame)
-    contentView = View(frame: CGRect.zero)
+    self.rootView = View()
+    self.rootView.frame = frame
+    contentView = View()
 
     Window.idGenerator += 1
     id = Window.idGenerator
@@ -146,7 +147,7 @@ open class Window: KeyEventDelegate, PointerEventDelegate {
   open func windowDidLaunch() {
     if centerOnLoad { center() }
     rootView.didAttachToWindow()
-    rootComponent.loadView(frame: .zero)
+    rootComponent.loadView()
 
     if let titleBar = titleBar {
       titleBar.title = title

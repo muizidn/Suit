@@ -30,8 +30,8 @@ public class DividerComponent: Component {
     super.init()
   }
   
-  override public func loadView(frame: CGRect) {
-    let grabberView = GrabberView(frame: frame)
+  override public func loadView() {
+    let grabberView = GrabberView()
     grabberView.orientation = orientation
     grabberView.onGrab = { [weak self] change in
       if let grabAction = self?.onGrab {
