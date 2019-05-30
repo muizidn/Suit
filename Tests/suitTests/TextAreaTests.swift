@@ -479,9 +479,9 @@ class TextAreaTests: XCTestCase {
       
       XCTAssert(visibleColumns.lowerBound == expectedColumnsStart,
                 "Scrolled text area's visible columns should start at 1.")
-      XCTAssert(Int(expectedColumnsEnd) == visibleColumns.upperBound,
+      XCTAssert(Int(expectedColumnsEnd) == visibleColumns.upperBound - 1,
                 "End visible column is not as expected.")
-            
+      
       horizontalScrollAmount -= 5
     }
   }
