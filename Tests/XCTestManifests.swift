@@ -89,6 +89,7 @@ extension TextAreaTests {
         ("testTextInsertion", testTextInsertion),
         ("testTextInsertionPerformance", testTextInsertionPerformance),
         ("testTriggerCharacters", testTriggerCharacters),
+        ("testVisibleColumnsCalculation", testVisibleColumnsCalculation),
     ]
 }
 
