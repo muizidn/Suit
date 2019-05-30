@@ -293,6 +293,7 @@ class Scroller: View {
   var radius: Double = 8
   
   var hasBeenGrabbed = false
+  var lastGrabbedPoint: CGPoint?
   
   weak var scrollView: ScrollView?
   
@@ -374,11 +375,13 @@ class Scroller: View {
     
     if pointerEvent.type == .release {
       hasBeenGrabbed = false
+      lastGrabbedPoint = nil
       window.releaseFocus(on: self)
       wasConsumed = true
     }
     else if pointerEvent.type == .click {
       hasBeenGrabbed = true
+      lastGrabbedPoint = windowCoordinatesInViewSpace(from: pointerEvent.location)
       wasConsumed = true
       window.lockFocus(on: self)
     }
@@ -391,18 +394,17 @@ class Scroller: View {
       
       if isHorizontal {
         // The scroll should feel like it's centered on the point in the scroller that
-        // is grabbed, so we need to find the position the scroller where the pointer
+        // is grabbed, so we need to find the position in the scroller where the pointer
         // is and include that in any events.
-        let positionOnXScroller = location.x - frame.width
-        // The X delta is the difference between the position of the scroller,
-        // the position of the pointer, adding the position on the scroller.
-        let x = frame.origin.x - (location.x + positionOnXScroller)
+        let startX = lastGrabbedPoint?.x ?? 0
+        let x = (startX - location.x)
+
         event.deltaX = x
         event.deltaY = 0
       } else {
-        let positionOnYScroller = location.y - frame.height
-        let y = frame.origin.y - (location.y + positionOnYScroller)
-        
+        let startY = lastGrabbedPoint?.y ?? 0
+        let y = (startY - location.y)
+
         event.deltaY = y
         event.deltaX = 0
       }
