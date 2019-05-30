@@ -48,7 +48,7 @@ public class TestGraphics: Graphics {
   public func drawRadialGradient(inRect rectangle: CGRect, startColor: Color, stopColor: Color) {}
   
   public func size(of string: String, wrapping: TextWrapping) -> CGRect {
-    return .zero
+    return CGRect(x: 0, y: 0, width: 5, height: 5)
   }
   
   public func prepareForReuse() {}

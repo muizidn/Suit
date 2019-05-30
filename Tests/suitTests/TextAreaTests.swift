@@ -440,4 +440,49 @@ class TextAreaTests: XCTestCase {
       XCTFail("Expected valid position info, got nil.")
     }
   }
+  
+  ///
+  /// Test that the reported visible columns are correct when the text area is scrolled.
+  ///
+  func testVisibleColumnsCalculation() {
+    let textArea = createTextArea()
+    let numberOfColumns = 20
+    let content = String(repeating: "_", count: numberOfColumns)
+    populate(textArea: textArea,
+             with: content)
+    
+    let charSize = textArea.graphics.size(of: "_",
+                                          wrapping: .none)
+    
+    textArea.height = 100%
+    textArea.width = 100~
+
+    let scrollView = ScrollView()
+    scrollView.add(subview: textArea)
+    scrollView.height = 100~
+    scrollView.width = 10~
+    
+    window.rootView = scrollView
+    scrollView.invalidateLayout()
+    
+    var horizontalScrollAmount: CGFloat = 0
+    
+    // Scroll across the text view and ensure that the visibleColumns are as expected.
+    //
+    while horizontalScrollAmount > -(textArea.frame.width + 10) {
+      scrollView.scroll(to: CGPoint(x: horizontalScrollAmount, y: 0))
+      let visibleColumns = textArea.visibleColumns(onLine: 1)
+      
+      let expectedColumnsStart = Int(abs(scrollView.xOffsetTotal / charSize.width))
+      var expectedColumnsEnd = Int((scrollView.frame.width + -scrollView.xOffsetTotal) / charSize.width)
+      expectedColumnsEnd = Int(min(expectedColumnsEnd, numberOfColumns))
+      
+      XCTAssert(visibleColumns.lowerBound == expectedColumnsStart,
+                "Scrolled text area's visible columns should start at 1.")
+      XCTAssert(Int(expectedColumnsEnd) == visibleColumns.upperBound,
+                "End visible column is not as expected.")
+            
+      horizontalScrollAmount -= 5
+    }
+  }
 }

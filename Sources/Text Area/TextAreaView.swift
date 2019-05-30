@@ -401,7 +401,7 @@ open class TextAreaView: View {
       
       let lineRect = lineRectCache[line - 1]
       
-      let visibleArea = CGRect(x: lineRect.origin.x - scrollOffsets.x,
+      let visibleArea = CGRect(x: lineRect.origin.x - scrollOffsets.x - renderer.activeGutterWidth,
                                y: lineRect.origin.y,
                                width: scrollView.frame.width,
                                height: lineRect.height)
@@ -1593,7 +1593,7 @@ extension TextAreaView {
         xPos = (scrollView.frame.width / 2) - columnPoint.x
       }
     case .right:
-      xPos = scrollView.frame.width - xPos
+      xPos = (scrollView.frame.width - xPos) - 10 // -10 prevents the caret being right at the edge.
     case .left:
       xPos = -xPos
     }
