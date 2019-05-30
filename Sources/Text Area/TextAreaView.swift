@@ -405,9 +405,11 @@ open class TextAreaView: View {
                                y: lineRect.origin.y,
                                width: scrollView.frame.width,
                                height: lineRect.height)
-      
-      guard let lineRange = state.text.rangeOfLine(line) else {
-        return 0..<0
+
+      let isEmptyLine = state.text.lineCharacterRanges[line - 1].count <= 1 // 1 because of the new line char.
+     
+      guard let lineRange = state.text.rangeOfLine(line), !isEmptyLine else {
+        return -1 ..< -1
       }
       
       let start = indexNearest(point: visibleArea.origin) ?? lineRange.lowerBound
@@ -420,10 +422,10 @@ open class TextAreaView: View {
       let startCol = state.text.distance(from: lineRange.lowerBound, to: finalStart)
       let endCol = state.text.distance(from: lineRange.lowerBound, to: finalEnd)
       
-      return startCol..<endCol
+      return startCol..<endCol + 1
     }
     
-    return 0..<(state.text.lineCharacterRanges.last?.upperBound ?? 0)
+    return 0..<(state.text.lineCharacterRanges.last?.upperBound ?? 1)
   }
 
   /// This is used to track whether or not it's safe for us to automatically
