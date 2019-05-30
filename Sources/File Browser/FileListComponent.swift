@@ -86,7 +86,7 @@ public class FileListComponent: ListComponent {
   func isSelectable(_ url: URL) -> Bool {
     if !permittedFileTypes.isEmpty {
       return permittedFileTypes
-        .contains(where: { ("/" + url.lastPathComponent).hasSuffix($0) })
+        .contains(where: { !url.hasDirectoryPath && ("/" + url.lastPathComponent).hasSuffix($0) })
     } else {
       return isSelectingDirectory && url.hasDirectoryPath
     }
