@@ -62,6 +62,7 @@ open class Dropdown: View, DropdownSelectionDelegate {
   func didSelect(item: Int) {
     selectedItemIndex = item
     onSelect?(selectedItemIndex)
+    forceRedraw()
   }
   
   ///
