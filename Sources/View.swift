@@ -40,7 +40,10 @@ open class View: Hashable,
   private var _frame: CGRect
 
   /// The rect of this view, in the window's co-ordinate space.
-  public var frame: CGRect {
+  /// This is read-only and should only be used in order to see the
+  /// calculated layout resulting from the configuration of layout
+  /// properties such as `width`, `flexDirection`, 'alignContent' etc.
+  internal (set) public var frame: CGRect {
     set {
       _frame = newValue
       _bounds.size = newValue.size
@@ -84,8 +87,9 @@ open class View: Hashable,
 
   private var _bounds: CGRect
 
-  /// The rect of this view in its own coordinate space.
-  public var bounds: CGRect {
+  /// The rect of this view in its own coordinate space.  See `frame` for a discussion
+  /// of why this property is read-only.
+  internal (set) public var bounds: CGRect {
     set {
       _bounds = newValue
     }
