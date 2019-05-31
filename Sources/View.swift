@@ -129,10 +129,6 @@ open class View: Hashable,
 
   internal var yogaNode: YGNodeRef!
 
-  /// Specifies whether the yoga layout engine is enabled for this view.  This is true by default.
-  /// If you set this to false, you are responsible for manually mangaging your view's frame.
-  public var useLayoutEngine = true
-
   /// Should this view's contents be clipped at the 'bounds' rect?
   public var clipAtBounds = true
 
@@ -242,16 +238,14 @@ open class View: Hashable,
     subview.didAddToSuperview(self)
     subview.window = window
 
-    if useLayoutEngine {
-      if let existingOwner = YGNodeGetOwner(subview.yogaNode) {
-        YGNodeRemoveChild(existingOwner, subview.yogaNode)
-      }
-
-      YGNodeSetMeasureFunc(yogaNode, nil)
-      YGNodeInsertChild(yogaNode,
-                        subview.yogaNode,
-                        UInt32(subviews.count - 1))
+    if let existingOwner = YGNodeGetOwner(subview.yogaNode) {
+      YGNodeRemoveChild(existingOwner, subview.yogaNode)
     }
+
+    YGNodeSetMeasureFunc(yogaNode, nil)
+    YGNodeInsertChild(yogaNode,
+                      subview.yogaNode,
+                      UInt32(subviews.count - 1))
 
     if window != nil {
       subview.didAttachToWindow()
@@ -291,21 +285,19 @@ open class View: Hashable,
   /// Invalidates this view's layout, i.e. the layout of all subviews contained within this view.
   ///
   public func invalidateLayout() {
-    if useLayoutEngine {
-      if subviews.isEmpty {
-        YGNodeRemoveAllChildren(yogaNode)
-        YGNodeSetMeasureFunc(yogaNode) { (node, width, widthMode, height, heightMode) -> YGSize in
-          let constrainedWidth = (widthMode == YGMeasureModeUndefined)
-            ?  100 : width
-          let constrainedHeight = (heightMode == YGMeasureModeUndefined)
-            ? 10 : height
+    if subviews.isEmpty {
+      YGNodeRemoveAllChildren(yogaNode)
+      YGNodeSetMeasureFunc(yogaNode) { (node, width, widthMode, height, heightMode) -> YGSize in
+        let constrainedWidth = (widthMode == YGMeasureModeUndefined)
+                             ?  100 : width
+        let constrainedHeight = (heightMode == YGMeasureModeUndefined)
+                              ? 10 : height
 
-          return YGSize(width: constrainedWidth, height: constrainedHeight)
-        }
-        YGNodeMarkDirty(yogaNode)
+        return YGSize(width: constrainedWidth, height: constrainedHeight)
       }
-      applyLayout()
+      YGNodeMarkDirty(yogaNode)
     }
+    applyLayout()
 
     subviews.forEach { $0.invalidateLayout() }
   }
