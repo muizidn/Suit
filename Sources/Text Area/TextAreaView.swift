@@ -329,7 +329,7 @@ open class TextAreaView: View {
   private var expectedColumn: Int?
 
   /// The insertion point, in String index terms.
-  public var positionIndex: String.Index?
+  public private (set) var positionIndex: String.Index?
 
   /// The insertion point in terms of character count.
   public var position: Int? {
