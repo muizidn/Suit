@@ -1305,7 +1305,7 @@ open class TextAreaView: View {
                         characters.count + (position ?? 0))
 
     if state.text.numberOfLines != lineCount {
-      window.redrawManager.redraw(view: self)
+      forceRedraw()
     }
 
     didInsert(text: characters, at: newPosition)
