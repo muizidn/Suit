@@ -485,11 +485,14 @@ open class TextAreaView: View {
     currentLine = positionInfo?.line
     currentColumn = positionInfo?.column
     
+    // Redraws have been explicitly disabled, so we can safely skip the rest.
+    if disableRedraw { return }
+    
     guard let oldLineNumber = oldLine,
       let currentLineNumber = currentLine,
       selectedLineRects.isEmpty else
     {
-      window.redrawManager.redraw(view: self)
+      forceRedraw()
       return
     }
     
@@ -499,7 +502,7 @@ open class TextAreaView: View {
                                                                                onLine: currentLineNumber) {
       return
     }
-
+    
     // Try to be as efficient as possible in calculating dirty areas as this will have a
     // very large impact on editor performance.
 
@@ -507,10 +510,12 @@ open class TextAreaView: View {
     // TODO: we could further optimize this by only drawing what's changed.
     if oldLineNumber == currentLineNumber {
       if let dirtyRect = lineRectCache[safe: currentLineNumber - 1] {
-
+        // Ensure we redraw the full width of the view.
+        var rect = dirtyRect
+        rect.size.width = frame.width
         window.redrawManager.redraw(view: self,
-                                    dirtyRect: dirtyRect.offsetBy(dx: frame.origin.x,
-                                                                  dy: frame.origin.y))
+                                    dirtyRect: rect.offsetBy(dx: frame.origin.x,
+                                                             dy: frame.origin.y))
       }
     }
     else {
@@ -1323,9 +1328,9 @@ open class TextAreaView: View {
   ///
   func handleDeleteKeyEvent(_ keyEvent: KeyEvent) -> Bool {
     guard keyEvent.keyType == .delete else { return false }
-
+    
     if deleteSelection() {
-      window.redrawManager.redraw(view: self)
+      forceRedraw()
       return true
     }
 
@@ -1369,7 +1374,7 @@ open class TextAreaView: View {
       // Calling this here just assumes the worst case scenario,
       // but we can be much smarter than that.
       resizeToFitContent()
-      window.redrawManager.redraw(view: self)
+      forceRedraw()
     } else if let currentLine = currentLine {
       resizeToFitContent(onLine: currentLine)
     }

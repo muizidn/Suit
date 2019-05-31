@@ -149,6 +149,12 @@ open class View: Hashable,
   public var isDraggable = false
   public var isDraggingInView = false
 
+  /// This property is false by default.  You can set it to true prior to a series of expensive or rapid
+  /// update operations, then back to false just before you're finished.  This can prevent jankiness
+  /// as well as improve performance.  Custom views can refer to this property in order to take fast paths
+  /// when this property is true.
+  public var disableRedraw = false
+  
   var hasMouseInside = false
   public var background = Background()
 
@@ -270,7 +276,9 @@ open class View: Hashable,
   /// avoided outside of custom view implementations.
   ///
   public func forceRedraw() {
-    window?.redrawManager.redraw(view: self)
+    if !disableRedraw {
+      window?.redrawManager.redraw(view: self)
+    }
   }
 
   // MARK: - Layout methods
