@@ -68,6 +68,7 @@ public class X11Application: Application {
   let display = XOpenDisplay(nil)!
 
   public override func launch() {
+    Cursor.shared = X11Cursor()
     add(window: mainWindow)
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
       self.run()
