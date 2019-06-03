@@ -39,7 +39,6 @@ open class TextAreaComponent: CompositeComponent {
     
     textAreaView?.resizeToFitContent()
     view.window.rootView.invalidateLayout()
-    scrollView.contentsDidChange()
   }
   
   open override func updateAppearance(style: AppearanceStyle) {
