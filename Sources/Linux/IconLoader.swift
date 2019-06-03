@@ -108,11 +108,8 @@ class IconLoader {
     }
 
     gdImageDestroy(iconPtr)
-
-    print(type(of: imageData))
     return imageData
   }
-
 }
 
 
