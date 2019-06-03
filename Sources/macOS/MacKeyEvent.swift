@@ -49,7 +49,7 @@ struct MacKeyEvent: KeyEvent {
     default:
       strokeType = .down
     }
-    
+        
     if !isFlagsChangedEvent,
       let code = event.characters?.first?.unicodeScalars.first?.value {
       switch Int(code) {

@@ -7,6 +7,7 @@
 
 import Foundation
 
+#if os(Linux)
 extension ContextMenuController {
   
   func createTitleBarMenu(in window: Window) {
@@ -15,7 +16,6 @@ extension ContextMenuController {
       return
     }
     
-    #if os(Linux)
     let menuButton = titleBar.createMenuButton()
     self.menuButton = menuButton
     
@@ -26,6 +26,20 @@ extension ContextMenuController {
                           asChildOf: menuButton?.window)
       self?.displayRootMenu()
     }
-    #endif
+  }
+  
+  func displayRootMenu() {
+    var rootItems = menu.rootMenuItems
+    
+    let applicationMenuIndex = rootItems
+      .firstIndex(where: { $0.title.lowercased() == "application" })
+    
+    if let index = applicationMenuIndex {
+      let applicationMenu = rootItems.remove(at: index)
+      rootItems.append(contentsOf: applicationMenu.subMenuItems ?? [])
+    }
+    
+    display(menuItems: rootItems)
   }
 }
+#endif

@@ -27,7 +27,7 @@ public class X11Window {
   var realX11Window: UInt!
 
   /// A GTK-style menu for the window.
-  var gtkMenu: GtkStyleMenu?
+  var gtkMenu: ContextMenuController?
 
   public init(window: Window, display: OpaquePointer!) {
     self.window = window
@@ -291,8 +291,8 @@ extension X11Window: PlatformWindowDelegate {
 
   @usableFromInline
   func applyMenu(_ menu: Menu) {
-    gtkMenu = GtkStyleMenu(menu: menu)
-    gtkMenu?.apply(to: window)
+    gtkMenu = ContextMenuController(menu: menu)
+    gtkMenu?.createTitleBarMenu(in: window)
   }
 
   ///

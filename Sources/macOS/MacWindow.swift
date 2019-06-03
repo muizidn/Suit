@@ -145,6 +145,20 @@ public class MacWindow: NSWindow {
     _ = mouseEventDelegate?.onPointerEvent(mouseEvent)
   }
   
+  public override func rightMouseUp(with event: NSEvent) {
+    let location = CGPoint(x: mouseLocationOutsideOfEventStream.x,
+                           y: window.rootView.frame.size.height - mouseLocationOutsideOfEventStream.y)
+    
+    let pointerEvent = PointerEvent(type: .rightClick,
+                                    eventCount: 1,
+                                    phase: .started,
+                                    deltaX: 0,
+                                    deltaY: 0,
+                                    location: location,
+                                    dragStartingPoint: nil)
+    _ = mouseEventDelegate?.onPointerEvent(pointerEvent)
+  }
+  
   public override var canBecomeKey: Bool {
     return true
   }

@@ -23,26 +23,6 @@ public class ContextMenuController: ContextMenuSelectionDelegate {
     self.menu = menu
   }
 
-  func apply(to window: Window) {
-    guard let titleBar = window.titleBar else {
-      print("Error: cannot apply a menu to a window that has no title bar.")
-      return
-    }
-
-    #if os(Linux)
-    let menuButton = titleBar.createMenuButton()
-    self.menuButton = menuButton
-
-    menuButton.onPress = { [weak self] in
-      let point = menuButton.coordinatesInWindowSpace(from: menuButton.frame.origin)
-      self?.configureMenu(from: CGPoint(x: point.x,
-                                        y: menuButton.frame.height + point.y),
-                          asChildOf: menuButton?.window)
-      self?.displayRootMenu()
-    }
-    #endif
-  }
-
   func configureMenu(from point: CGPoint, asChildOf parent: Window?) {
     contentsComponent.delegate = self
     contentsComponent.itemHeight = 20
@@ -60,21 +40,10 @@ public class ContextMenuController: ContextMenuSelectionDelegate {
     Application.shared.add(window: window, asChildOf: parent)
   }
 
-  func displayRootMenu() {
-    var rootItems = menu.rootMenuItems
-
-    let applicationMenuIndex = rootItems
-      .firstIndex(where: { $0.title.lowercased() == "application" })
-
-    if let index = applicationMenuIndex {
-      let applicationMenu = rootItems.remove(at: index)
-      rootItems.append(contentsOf: applicationMenu.subMenuItems ?? [])
-    }
-
-    display(menuItems: rootItems)
-  }
-
   func display(menuItems: [MenuItem]) {
+    contentsComponent.view.window.titleBarHeight =
+      currentMenu?.parent == nil ? 0 : 45
+
     contentsComponent.items = menuItems
     contentsComponent.reload()
   }
@@ -93,7 +62,7 @@ public class ContextMenuController: ContextMenuSelectionDelegate {
     if let parent = currentMenu?.parent {
       didSelect(menuItem: parent)
     } else {
-      displayRootMenu()
+      display(menuItems: menu.rootMenuItems)
     }
   }
 

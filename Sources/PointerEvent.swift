@@ -21,6 +21,7 @@ public enum PointerEventPhase {
 public enum PointerEventType {
   case drag
   case click
+  case rightClick
   case release
   case enter
   case exit

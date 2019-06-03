@@ -8,7 +8,7 @@
 import Foundation
 
 public protocol TreeViewItem: class {
-    
+  
   /// Used to track whether this item is expanded or not.
   var isExpanded: Bool { get set }
   

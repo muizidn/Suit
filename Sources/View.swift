@@ -170,6 +170,18 @@ open class View: Hashable,
   public var hasKeyFocus: Bool {
     return window?.keyView == self
   }
+  
+  public var contextMenu: Menu? {
+    didSet {
+      if let menu = contextMenu {
+        contextMenuController = ContextMenuController(menu: menu)
+      } else {
+        contextMenuController = nil
+      }
+    }
+  }
+  
+  var contextMenuController: ContextMenuController?
 
   private var isManuallySetOpaque: Bool?
   
@@ -510,8 +522,16 @@ open class View: Hashable,
       }
 
       if hitTest {
+        // Show a context menu, if necessary.
+        if pointerEvent.type == .rightClick && shouldShowContextMenu(),
+          let menuController = contextMenuController {
+          wasConsumed = true
+          menuController.configureMenu(from: pointerEvent.location,
+                             asChildOf: window)
+          menuController.display(menuItems: contextMenu?.rootMenuItems ?? [])
+        }
         // Convert a "move" into an "enter" if the pointer wasn't previously inside this view.
-        if !subview.hasMouseInside && pointerEvent.type == .move {
+        else if !subview.hasMouseInside && pointerEvent.type == .move {
           subview.hasMouseInside = true
           var event = pointerEvent
           event.type = .enter
@@ -527,6 +547,14 @@ open class View: Hashable,
       if wasConsumed { break }
     }
     return wasConsumed
+  }
+  
+  ///
+  /// Specifies whether or not a context menu should be shown when this view is right-clicked.
+  /// This default to true if a contextMenu is defined for this view.
+  ///
+  open func shouldShowContextMenu() -> Bool {
+    return contextMenu != nil
   }
 
   ///

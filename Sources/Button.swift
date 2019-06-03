@@ -437,7 +437,6 @@ open class Button: View {
       case .click:
         state = .pressed
         window.lockFocus(on: self)
-
       // We don't want a button being dragged to drag the parent view, i.e. the titlebar.
       case .release:
         if hitTest(point: pointerEvent.location) && state == .pressed {

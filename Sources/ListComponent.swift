@@ -17,7 +17,7 @@ open class ListComponent: Component, ListViewDatasource {
       listView?.datasource = datasource
     }
   }
-
+  
   override open func loadView() {
     view = ScrollView()
   }
