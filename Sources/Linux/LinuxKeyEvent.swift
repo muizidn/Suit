@@ -25,7 +25,7 @@ struct LinuxKeyEvent: KeyEvent {
      if keyState & ShiftMask != 0 {
        modifiers?.append(.shift)
     }
-
+    
     if keyState & ControlMask != 0 {
       // Get the string without the control modifier in XLookupstring
       keyEvent.state = 0
@@ -43,6 +43,9 @@ struct LinuxKeyEvent: KeyEvent {
     switch Int32(keySym) {
       case XK_BackSpace:
         self.keyType = .delete
+      case XK_Delete:
+        self.keyType = .delete
+        self.modifiers?.append(.function)
       case XK_Left:
         self.keyType = .leftArrow
       case XK_Right:
