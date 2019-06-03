@@ -23,7 +23,7 @@ extension ContextMenuController {
       let point = menuButton.coordinatesInWindowSpace(from: menuButton.frame.origin)
       self?.configureMenu(from: CGPoint(x: point.x,
                                         y: menuButton.frame.height + point.y),
-                          asChildOf: menuButton?.window)
+                          asChildOf: menuButton.window)
       self?.displayRootMenu()
     }
   }
