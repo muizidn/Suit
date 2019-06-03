@@ -49,6 +49,7 @@ package.dependencies += [
   .package(url: "https://github.com/pmacro/Fontconfig", .branch("master")),
   .package(url: "https://github.com/pmacro/X11", .branch("master")),
   .package(url: "https://github.com/pmacro/CClipboard", .branch("master")),
+  .package(url: "https://github.com/pmacro/GD", .branch("master")),
 ]
 
 let suitTarget = package.targets.first(where: { $0.name == "Suit" })

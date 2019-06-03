@@ -108,6 +108,31 @@ public class X11Window {
 
     XSetWindowBorderWidth(display, realX11Window, 1) 
   }
+
+  ///
+  /// Sets the path of the icon to be used for this window (for the taskbar, task switcher et al.).
+  ///
+  func setIcon(path: String) {
+    guard let imageData = IconLoader.loadIcon(from: path) else {
+      print("Error: window will not have an icon.")
+      return
+    }
+
+    let property = XInternAtom(display, "_NET_WM_ICON", 0) // 0 == false here
+    let cardinal = XInternAtom(display, "CARDINAL", 0)
+
+    var data = unsafeBitCast(imageData, to: [UInt8].self)
+
+    XChangeProperty(display, 
+                    realX11Window, 
+                    property, 
+                    cardinal,
+                    32, 
+                    PropModeReplace, 
+                    &data, 
+                    // TODO get size from iconLoader rather than make an expensive count call.
+                    Int32(imageData.count))
+  }
 }
 
 extension X11Window: KeyEventDelegate {

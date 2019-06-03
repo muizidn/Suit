@@ -67,12 +67,8 @@ public class X11Application: Application {
 
   let display = XOpenDisplay(nil)!
 
-  override init(with window: Window) {
-    super.init(with: window)
-    add(window: window)
-  }
-
   public override func launch() {
+    add(window: mainWindow)
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
       self.run()
     }
@@ -91,6 +87,11 @@ public class X11Application: Application {
     window.x11Window = x11Window
     window.platformWindowDelegate = x11Window
     x11Window.hideWindowDecorations()
+
+    if parentWindow == nil, let iconPath = iconPath {
+      x11Window.setIcon(path: iconPath)
+    }
+    
     x11Window.show()
 
     if parentWindow != nil {
