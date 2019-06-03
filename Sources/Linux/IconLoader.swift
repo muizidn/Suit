@@ -14,6 +14,9 @@ fileprivate enum ColorChannel {
 ///
 class IconLoader {
 
+  /// Cache the icons since loading these can be quite a performance hit.
+  fileprivate static var iconCache: [String : [CUnsignedLong]?] = [:]
+
   ///
   /// For a GD image, and given an Int32 containing the colour information for a single pixel, 
   /// returns the colour information for a particular channel (rgba).
@@ -53,8 +56,12 @@ class IconLoader {
 
   ///
   /// Loads the icon from the given path into a CUnsignedLong array, suitable for use with X.
-  ///
+  ///nil
   static func loadIcon(from path: String) -> [CUnsignedLong]? {
+    if let cachedResult = iconCache[path] {
+      return cachedResult
+    }
+ 
     guard let cPath = path.cString(using: .utf8),
       let iconFile = fopen(cPath, "r") else {
         print("Couldn't read icon from path: \(path)")
@@ -108,6 +115,8 @@ class IconLoader {
     }
 
     gdImageDestroy(iconPtr)
+
+    iconCache[path] = imageData
     return imageData
   }
 }

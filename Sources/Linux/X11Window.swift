@@ -122,7 +122,7 @@ public class X11Window {
     let cardinal = XInternAtom(display, "CARDINAL", 0)
 
     var data = unsafeBitCast(imageData, to: [UInt8].self)
-
+    
     XChangeProperty(display, 
                     realX11Window, 
                     property, 
