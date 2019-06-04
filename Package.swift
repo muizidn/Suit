@@ -18,8 +18,7 @@ let package = Package(
     ],
   
     dependencies: [
-      .package(url: "https://github.com/pmacro/Yoga", .branch("master")),
-
+      .package(url: "https://github.com/pmacro/Yoga", .branch("master"))
     ],
   
   targets: [
@@ -40,6 +39,8 @@ let package = Package(
     ]
 )
 
+let suitTarget = package.targets.first(where: { $0.name == "Suit" })
+
 #if os(Linux)
 package.dependencies += [
   .package(url: "https://github.com/pmacro/Cairo", .branch("master")),
@@ -52,7 +53,8 @@ package.dependencies += [
   .package(url: "https://github.com/pmacro/GD", .branch("master")),
 ]
 
-let suitTarget = package.targets.first(where: { $0.name == "Suit" })
 suitTarget!.dependencies.append("CClipboard")
+#elseif os(macOS)
+suitTarget!.exclude = ["Linux"]
 
 #endif
