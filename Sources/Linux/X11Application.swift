@@ -196,6 +196,9 @@ public class X11Application: Application {
           pointerEvent.type = .scroll
           pointerEvent.deltaY = 100
         }
+        else if event.xbutton.button == Button3 {
+          pointerEvent.type = .rightClick
+        }
         else {
           if event.xbutton.time - lastButtonPressTime < 400 {
             clickCount += 1
