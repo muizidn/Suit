@@ -1146,7 +1146,7 @@ open class TextAreaView: View {
 
       // Defer trigger key handling so that any included edits are applied first.
       defer {
-        // If we detect a trigger character, invoke the approprate method
+        // If we detect a trigger character, invoke the appropriate method
         // so subclasses can react, if needed.
         for triggerKey in triggerKeyEvents {
           if keyEvent.characters == triggerKey.characters

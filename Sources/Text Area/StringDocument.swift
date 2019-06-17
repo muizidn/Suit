@@ -7,6 +7,7 @@
 
 import Foundation
 
+#if swift(<5.1)
 /// DELETE ME once we switch to Swift 5.1.
 extension String {
   var isNativeUTF8: Bool {
@@ -19,6 +20,7 @@ extension String {
     }
   }
 }
+#endif
 
 ///
 /// A StringDocument is the backing storage for a TextAreaView's contents.  It provides
